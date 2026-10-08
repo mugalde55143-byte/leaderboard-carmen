@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Leaderboard</title>
+<style>
+body { font-family: sans-serif; max-width: 480px; margin: 40px auto; }
+li { padding: 4px 0; }
+</style>
+</head>
+<body>
+<h1>🏆 Leaderboard</h1>
+<form id="form">
+<input id="name" placeholder="Jugador" required>
+<input id="score" type="number" placeholder="Puntos" required>
+
+<button>Enviar</button>
+</form>
+<ol id="list"></ol>
+<script>
+async function cargar() {
+const res = await fetch("/api/scores");
+const datos = await res.json();
+const lista = document.getElementById("list");
+lista.innerHTML = "";
+for (const d of datos) {
+const li = document.createElement("li");
+li.textContent = `${d.name} — ${d.score} pts`;
+lista.appendChild(li);
+}
+}
+document.getElementById("form").addEventListener("submit", async (e) => {
+e.preventDefault();
+await fetch("/api/scores", {
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({
+name: document.getElementById("name").value,
+score: parseInt(document.getElementById("score").value)
+})
+});
+e.target.reset();
+cargar();
+});
+cargar();
+</script>
+</body>
+</html>
